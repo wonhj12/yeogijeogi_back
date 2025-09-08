@@ -1,9 +1,8 @@
+import uuid
 from fastapi import APIRouter
 
 from app.db.models.users import Users
 
-
-router = APIRouter()
 
 router = APIRouter(
     prefix="/test",
@@ -25,8 +24,6 @@ def read_root():
     },
 )
 async def test_create_user():
-    import uuid
-
     user_id = str(uuid.uuid4())
     new_user = Users(id=user_id)
 
