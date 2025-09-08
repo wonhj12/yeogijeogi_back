@@ -17,6 +17,5 @@ class WalkSummary(Document):
     memo: str | None = None
     created_at: datetime = Field(default_factory=datetime.now)
 
-
-class Settings:
-    name = "walk_summary"
+    class Settings:
+        name = "walk_summary"

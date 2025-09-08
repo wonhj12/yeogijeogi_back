@@ -23,15 +23,14 @@ class WalkPoints(Document):
     location: Annotated[Coordinate, Indexed(index_type=pymongo.GEOSPHERE)]
     created_at: datetime = Field(default_factory=datetime.now)
 
-
-class Settings:
-    name = "walk_points"
-    indexes = [
-        pymongo.IndexModel(
-            [
-                ("walk_id", pymongo.ASCENDING),
-                ("index", pymongo.ASCENDING),
-            ],
-            unique=True,
-        )
-    ]
+    class Settings:
+        name = "walk_points"
+        indexes = [
+            pymongo.IndexModel(
+                [
+                    ("walk_id", pymongo.ASCENDING),
+                    ("index", pymongo.ASCENDING),
+                ],
+                unique=True,
+            )
+        ]

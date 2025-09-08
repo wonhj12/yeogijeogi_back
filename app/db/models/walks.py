@@ -14,6 +14,5 @@ class Walks(Document):
     distance: float  # 예상 산책 거리
     created_at: datetime = Field(default_factory=datetime.now)
 
-
-class Settings:
-    name = "walks"
+    class Settings:
+        name = "walks"
