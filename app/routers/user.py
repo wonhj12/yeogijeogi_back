@@ -14,15 +14,8 @@ def get_user_service(user_id: str = Depends(get_uuid)):
     return UserService(UserDAO(user_id))
 
 
-@router.post(
-    "/",
-    responses={
-        201: {"message": "User created successfully"},
-        401: {"message": "Invalid Token"},
-        500: {"message": "Internal Server Error"},
-    },
-)
+@router.post("/", status_code=201)
 # 유저 등록
 async def create_user(user_service: UserService = Depends(get_user_service)):
-    await user_service.create_user()
-    return True
+    await user_service.crerate_user()
+    return {"message": "user-created"}
