@@ -17,5 +17,5 @@ def get_user_service(user_id: str = Depends(get_uuid)):
 @router.post("/", status_code=201)
 # 유저 등록
 async def create_user(user_service: UserService = Depends(get_user_service)):
-    await user_service.crerate_user()
+    await user_service.create_user()
     return {"message": "user-created"}
