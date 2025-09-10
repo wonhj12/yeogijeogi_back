@@ -20,7 +20,7 @@ class FirebaseAuth:
         except auth.InvalidIdTokenError:
             print("Invalid token")
             raise HTTPException(status_code=401, detail="invalid-token")
-        except:
+        except Exception:
             print("Unknown error")
             raise HTTPException(status_code=500, detail="unknown-error")
 
