@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     mongo_uri: str
     mongo_database_name: str
     model_config = SettingsConfigDict(env_file=env_path, env_file_encoding="utf-8")
+    firebase_auth: str
 
 
 @lru_cache

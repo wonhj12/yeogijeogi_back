@@ -206,5 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# Firebase
+firebase_credentials.json
+
 # Miscellaneouse
 .DS_Store
