@@ -1,5 +1,8 @@
 # 여기저기
 
+## 데이터베이스
+<img width="100%" src="https://github.com/user-attachments/assets/ac271186-79eb-4b2c-a329-a39a54aa2308" />
+
 ## 커밋 메시지 컨벤션
 
 ### 1. 커밋 유형 지정
