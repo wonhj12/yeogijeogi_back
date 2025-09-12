@@ -14,7 +14,7 @@ class WalkSummary(Document):
     distance: float  # 실제 산책 거리
     difficulty: int  # -5 ~ 5
     mood: int  # -5 ~ 5
-    memo: str | None = None
+    memo: str = Field(default="")
     created_at: datetime = Field(default_factory=datetime.now)
 
     class Settings:
