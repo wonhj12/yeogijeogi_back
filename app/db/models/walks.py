@@ -1,18 +1,30 @@
-from beanie import Document, BeanieObjectId, Link
 from datetime import datetime
-from pydantic import Field
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
-from app.db.models.users import Users
+from app.db.database import Base
 
 
-class Walks(Document):
-    _id: BeanieObjectId
-    user_id: Link[Users]
-    name: str  # 시작
-    address: str  # 시작 지점 주소
-    time: int  # 예상 산책 시간
-    distance: float  # 예상 산책 거리
-    created_at: datetime = Field(default_factory=datetime.now)
+class Walks(Base):
+    """
+    Attributes:
+        id (int): 산책 ID
+        user_id (str): 사용자 ID
+        name (str): 산책 시작 장소 이름
+        address (str): 산책 시작 장소 주소
+        time (int): 산책 예상 시간 (분)
+        distance (float): 산책 예상 거리 (km)
+        created_at (datetime): 산책 생성 일시
+    """
 
-    class Settings:
-        name = "walks"
+    __tablename__ = "walks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id"))
+    name = Column(String, nullable=False)
+    address = Column(String, nullable=False)
+    time = Column(Integer, nullable=False)
+    distance = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+
+    user = relationship("Users", back_populates="walks")

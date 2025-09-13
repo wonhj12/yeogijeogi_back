@@ -1,9 +1,15 @@
-from beanie import Document
-from pydantic import Field
+from sqlalchemy import Column, String
 
 
-class Users(Document):
-    id: str = Field(alias="_id")
+from app.db.database import Base
 
-    class Settings:
-        name = "users"
+
+class Users(Base):
+    """
+    Attributes:
+        id (str): Firebase UID
+    """
+
+    __tablename__ = "users"
+
+    id = Column(String, primary_key=True, index=True)
