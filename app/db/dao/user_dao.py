@@ -2,7 +2,6 @@ from beanie import BulkWriter
 from fastapi import HTTPException
 
 from app.db.interface.user_interface import UserInterface
-from app.db.models.coordinate import Coordinate
 from app.db.models.users import Users
 from app.db.models.walk_points import WalkPoints
 from app.db.models.walk_summary import WalkSummary
