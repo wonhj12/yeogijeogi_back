@@ -20,6 +20,22 @@ class FirebaseAuth:
         except auth.InvalidIdTokenError:
             print("Invalid token")
             raise HTTPException(status_code=401, detail="invalid-token")
+        except auth.ErrorInfo as e:
+            print("Firebase auth error:", e.reason)
+            raise HTTPException(status_code=500, detail="unknown-firebase-error")
+        except Exception:
+            print("Unknown error")
+            raise HTTPException(status_code=500, detail="unknown-error")
+
+    def delete_user(self, user_id):
+        try:
+            auth.delete_user(user_id)
+        except auth.UserNotFoundError:
+            print("User not found")
+            raise HTTPException(status_code=404, detail="user-not-found")
+        except auth.ErrorInfo as e:
+            print("Firebase auth error:", e.reason)
+            raise HTTPException(status_code=500, detail="unknown-firebase-error")
         except Exception:
             print("Unknown error")
             raise HTTPException(status_code=500, detail="unknown-error")
