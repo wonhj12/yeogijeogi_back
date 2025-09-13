@@ -27,3 +27,10 @@ async def create_user(user_service: UserService = Depends(get_user_service)):
 async def get_user(user_service: UserService = Depends(get_user_service)):
     user = await user_service.get_user()
     return user
+
+
+# 유저 삭제
+@router.delete("/", status_code=200)
+async def delete_user(user_service: UserService = Depends(get_user_service)):
+    await user_service.delete_user()
+    return {"message": "user-deleted"}

@@ -12,3 +12,7 @@ class UserInterface(ABC):
     @abstractmethod
     async def create_user(self) -> None:
         pass
+
+    @abstractmethod
+    async def delete_user(self) -> None:
+        pass
