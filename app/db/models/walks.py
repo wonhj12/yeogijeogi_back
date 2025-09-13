@@ -28,3 +28,12 @@ class Walks(Base):
     created_at = Column(DateTime, default=datetime.now)
 
     user = relationship("Users", back_populates="walks")
+    walk_points = relationship(
+        "WalkPoints", back_populates="walk", cascade="all, delete-orphan"
+    )
+    walk_summaries = relationship(
+        "WalkSummaries",
+        back_populates="walk",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
