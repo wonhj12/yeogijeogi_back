@@ -1,3 +1,4 @@
+from app.core.firebase import get_auth
 from app.db.interface.user_interface import UserInterface
 from app.db.interface.walk_summary_interface import WalkSummaryInterface
 from app.schemas.user_schema.response_schema import GetUserResDTO
@@ -23,3 +24,7 @@ class UserService:
             walk_distance=summary.walk_distance,
             walk_time=summary.walk_time,
         )
+
+    async def delete_user(self) -> None:
+        await self.user_interface.delete_user()
+        get_auth().delete_user(self.user_interface.user_id)
