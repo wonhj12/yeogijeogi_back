@@ -5,8 +5,13 @@ from firebase_admin import initialize_app, credentials
 
 from app.core.config import get_settings
 from app.db.database import Base, engine
-from app.routers import root, user
-from app.routers import test
+from app.db.models import (
+    users,
+    walk_points,
+    walk_summaries,
+    walks,
+)  # db 정의 때문에 필요
+from app.routers import root, user, test
 
 
 @asynccontextmanager
