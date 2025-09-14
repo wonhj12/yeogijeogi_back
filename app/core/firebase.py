@@ -3,7 +3,7 @@ from firebase_admin import auth
 
 
 def check_token(token):
-    return auth.verify_id_token(token)
+    return auth.verify_id_token(token, clock_skew_seconds=5)
 
 
 class FirebaseAuth:
@@ -20,11 +20,8 @@ class FirebaseAuth:
         except auth.InvalidIdTokenError:
             print("Invalid token")
             raise HTTPException(status_code=401, detail="invalid-token")
-        except auth.ErrorInfo as e:
-            print("Firebase auth error:", e.reason)
-            raise HTTPException(status_code=500, detail="unknown-firebase-error")
-        except Exception:
-            print("Unknown error")
+        except Exception as e:
+            print("Unknown error:", e)
             raise HTTPException(status_code=500, detail="unknown-error")
 
     def delete_user(self, user_id):
@@ -33,10 +30,7 @@ class FirebaseAuth:
         except auth.UserNotFoundError:
             print("User not found")
             raise HTTPException(status_code=404, detail="user-not-found")
-        except auth.ErrorInfo as e:
-            print("Firebase auth error:", e.reason)
-            raise HTTPException(status_code=500, detail="unknown-firebase-error")
-        except Exception:
+        except Exception as e:
             print("Unknown error")
             raise HTTPException(status_code=500, detail="unknown-error")
 
