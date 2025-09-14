@@ -1,13 +1,17 @@
 import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from logging import info
 from firebase_admin import initialize_app, credentials
 
 from app.core.config import get_settings
-from app.db.mongodb import MongoDB
-from app.routers import root, user
-from app.routers import test
+from app.db.database import Base, engine
+from app.db.models import (
+    users,
+    walk_points,
+    walk_summaries,
+    walks,
+)  # db 정의 때문에 필요
+from app.routers import root, user, test
 
 
 @asynccontextmanager
@@ -21,16 +25,16 @@ async def db_lifespan(_: FastAPI):
         )
     cred = credentials.Certificate(settings.firebase_auth)
     initialize_app(cred)
-    info("Connected to Firebase")
 
-    db = MongoDB()
-    await db.connect_database()
-    await db.check_status()
-    info("Connected to database")
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        raise Exception(f"Database connection failed: {e}")
 
     yield
 
-    db.get_client().close()
+    await engine.dispose()
 
 
 app = FastAPI(lifespan=db_lifespan)

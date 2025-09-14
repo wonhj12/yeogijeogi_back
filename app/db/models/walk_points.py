@@ -1,36 +1,33 @@
-from beanie import Document, Link, Indexed
-from pydantic import Field
-from typing import Annotated
-from datetime import datetime
-import pymongo
-
-from app.db.models.coordinate import Coordinate
-from app.db.models.walks import Walks
-
-"""
-WalkPoints 객체 생성 예시
-WalkPoints(
-    walk_id=Walks 객체 id,
-    location=Coordinate(coordinates=[longitude, latitude]),
-    created_at=datetime.now()
+from sqlalchemy import (
+    Column,
+    Integer,
+    Float,
+    DateTime,
+    ForeignKey,
+    PrimaryKeyConstraint,
 )
-"""
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from app.db.database import Base
 
 
-class WalkPoints(Document):
-    index: int
-    walk_id: Link[Walks]
-    location: Annotated[Coordinate, Indexed(index_type=pymongo.GEOSPHERE)]
-    created_at: datetime = Field(default_factory=datetime.now)
+class WalkPoints(Base):
+    """
+    Attributes:
+        walk_id (int): 산책 ID
+        index (int): 산책 경로 인덱스
+        longitude (float): 경도
+        latitude (float): 위도
+        created_at (datetime): 생성 일시
+    """
 
-    class Settings:
-        name = "walk_points"
-        indexes = [
-            pymongo.IndexModel(
-                [
-                    ("walk_id", pymongo.ASCENDING),
-                    ("index", pymongo.ASCENDING),
-                ],
-                unique=True,
-            )
-        ]
+    __tablename__ = "walk_points"
+    __table_args__ = (PrimaryKeyConstraint("walk_id", "index", name="pk_walkpoints"),)
+
+    walk_id = Column(Integer, ForeignKey("walks.id"), nullable=False)
+    index = Column(Integer, nullable=False)
+    longitude = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+
+    walk = relationship("Walks", back_populates="walk_points")

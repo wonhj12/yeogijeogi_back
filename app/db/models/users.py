@@ -1,9 +1,17 @@
-from beanie import Document
-from pydantic import Field
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+
+from app.db.database import Base
 
 
-class Users(Document):
-    id: str = Field(alias="_id")
+class Users(Base):
+    """
+    Attributes:
+        id (str): Firebase UID
+    """
 
-    class Settings:
-        name = "users"
+    __tablename__ = "users"
+
+    id = Column(String, primary_key=True, index=True)
+
+    walks = relationship("Walks", back_populates="user", cascade="all, delete-orphan")

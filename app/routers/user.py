@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_uuid
-from app.db.dao.user_dao import UserDAO
-from app.db.dao.walk_summary_dao import WalkSummaryDAO
+from app.db.database import get_db
 from app.services.user_service import UserService
 
 router = APIRouter(
@@ -11,8 +11,11 @@ router = APIRouter(
 )
 
 
-def get_user_service(user_id: str = Depends(get_uuid)):
-    return UserService(UserDAO(user_id), WalkSummaryDAO())
+def get_user_service(
+    user_id: str = Depends(get_uuid),
+    session: AsyncSession = Depends(get_db),
+):
+    return UserService(user_id=user_id, session=session)
 
 
 # 유저 등록
