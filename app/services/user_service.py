@@ -66,8 +66,6 @@ class UserService:
         if not user:
             raise HTTPException(status_code=404, detail="user-not-found")
 
-        print(user.id)
-
         try:
             get_auth().delete_user(self.user_id)
             await self.session.delete(user)
