@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import func
+from sqlalchemy import Integer, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -45,7 +45,10 @@ class UserService:
 
         result = await self.session.execute(
             select(
-                func.coalesce(func.sum(WalkSummaries.distance), 0),
+                func.cast(
+                    func.floor(func.coalesce(func.sum(WalkSummaries.distance), 0)),
+                    Integer,
+                ),
                 func.coalesce(func.sum(WalkSummaries.time), 0),
             )
             .join(Walks, WalkSummaries.walk_id == Walks.id)
