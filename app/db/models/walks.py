@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
@@ -19,13 +19,13 @@ class Walks(Base):
 
     __tablename__ = "walks"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String, ForeignKey("users.id"))
     name = Column(String, nullable=False)
     address = Column(String, nullable=False)
     time = Column(Integer, nullable=False)
     distance = Column(Float, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, server_default=func.now())
 
     user = relationship("Users", back_populates="walks")
     walk_points = relationship(

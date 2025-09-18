@@ -6,6 +6,7 @@ from sqlalchemy import (
     Float,
     DateTime,
     ForeignKey,
+    func,
 )
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -38,7 +39,7 @@ class WalkSummaries(Base):
     difficulty = Column(Integer, nullable=False)
     mood = Column(Integer, nullable=False)
     memo = Column(String, default="", nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, server_default=func.now())
 
     walk = relationship("Walks", back_populates="walk_summaries")
 
