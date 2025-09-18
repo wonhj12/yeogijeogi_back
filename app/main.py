@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from firebase_admin import initialize_app, credentials
 
 from app.core.config import get_settings
+from app.utils.logging import setup_logging
 from app.db.database import Base, engine
 from app.db.models import (
     users,
@@ -16,6 +17,9 @@ from app.routers import course, root, user, test
 
 @asynccontextmanager
 async def db_lifespan(_: FastAPI):
+    setup_logging()
+
+    # Firebase 초기화
     settings = get_settings()
     if not settings.firebase_auth:
         raise Exception("Firebase Credential Location not found in .env")
@@ -26,6 +30,7 @@ async def db_lifespan(_: FastAPI):
     cred = credentials.Certificate(settings.firebase_auth)
     initialize_app(cred)
 
+    # DB 연결 및 테이블 생성
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
