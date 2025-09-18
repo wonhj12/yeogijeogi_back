@@ -1,6 +1,7 @@
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 
+from app.core.exceptions import InvalidTokenException
 from app.core.firebase import get_auth
 
 security = HTTPBearer(auto_error=False)
@@ -8,7 +9,7 @@ security = HTTPBearer(auto_error=False)
 
 def get_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if not credentials:
-        raise HTTPException(status_code=401, detail="invalid-token")
+        raise InvalidTokenException()
     return credentials.credentials
 
 

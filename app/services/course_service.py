@@ -1,6 +1,6 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import CourseFetchFailedException
 from app.repositories.course_repository import CourseRepository
 from app.schemas.course_schema.response_schema import CoursePreview, GetCoursesResDTO
 
@@ -25,5 +25,4 @@ class CourseService:
             return GetCoursesResDTO(courses=course_list)
 
         except Exception as e:
-            print("Error fetching courses:", e)
-            raise HTTPException(status_code=500, detail="course-fetch-failed")
+            raise CourseFetchFailedException(e=e)
