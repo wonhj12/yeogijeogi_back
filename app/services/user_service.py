@@ -1,78 +1,57 @@
-from fastapi import HTTPException
-from sqlalchemy import Integer, func
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
 from app.core.firebase import get_auth
+from app.db.database import get_db
 from app.db.models.users import Users
-from app.db.models.walk_summaries import WalkSummaries
-from app.db.models.walks import Walks
+from app.repositories.user_repository import UserRepository
 from app.schemas.user_schema.response_schema import GetUserResDTO
 
 
 class UserService:
-    def __init__(self, user_id: str, session: AsyncSession):
-        self.user_id = user_id
+    def __init__(
+        self,
+        user_repository: UserRepository = Depends(),
+        session: AsyncSession = Depends(get_db),
+    ):
+        self.user_repository = user_repository
         self.session = session
 
-    async def _check_user_exists(self) -> Users | None:
-        """DB에 사용자가 존재하는지 확인, 없으면 HTTPException 발생"""
-
-        result = await self.session.execute(
-            select(Users).where(Users.id == self.user_id)
-        )
-        user = result.scalars().first()
-        if not user:
-            return None
-        return user
-
-    async def create_user(self) -> None:
+    async def create_user(self, user_id: str) -> None:
         """Firebase UID를 기반으로 db에 사용자 등록"""
 
-        user = await self._check_user_exists()
+        user = await self.user_repository.get_by_id(self.session, user_id)
         if user:
             raise HTTPException(status_code=409, detail="user-already-exists")
 
-        new_user = Users(id=self.user_id)
-        self.session.add(new_user)
-        await self.session.commit()
+        await self.user_repository.create(self.session, user_id)
 
-    async def get_user(self) -> GetUserResDTO:
+    async def get_user(self, user_id: str) -> GetUserResDTO:
         """사용자 정보 조회 (총 산책 거리, 총 산책 시간)"""
-        user = await self._check_user_exists()
+
+        user = await self.user_repository.get_by_id(self.session, user_id)
         if not user:
             raise HTTPException(status_code=404, detail="user-not-found")
 
-        result = await self.session.execute(
-            select(
-                func.cast(
-                    func.floor(func.coalesce(func.sum(WalkSummaries.distance), 0)),
-                    Integer,
-                ),
-                func.coalesce(func.sum(WalkSummaries.time), 0),
-            )
-            .join(Walks, WalkSummaries.walk_id == Walks.id)
-            .where(Walks.user_id == self.user_id)
+        total_distance, total_time = await self.user_repository.get_user(
+            self.session, user_id
         )
-
-        total_distance, total_time = result.one()
 
         return GetUserResDTO(
             walk_distance=total_distance,
             walk_time=total_time,
         )
 
-    async def delete_user(self) -> None:
+    async def delete_user(self, user_id: str) -> None:
         """사용자 및 관련 데이터 삭제"""
 
-        user = await self._check_user_exists()
+        user = await self.user_repository.get_by_id(self.session, user_id)
         if not user:
             raise HTTPException(status_code=404, detail="user-not-found")
 
         try:
-            get_auth().delete_user(self.user_id)
-            await self.session.delete(user)
-            await self.session.commit()
+            get_auth().delete_user(user_id)
+            await self.user_repository.delete(self.session, user)
         except Exception:
             await self.session.rollback()
             raise HTTPException(status_code=500, detail="user-withdrawal-failed")
