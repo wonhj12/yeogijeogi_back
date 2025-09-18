@@ -1,6 +1,10 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import (
+    UserAlreadyExistsException,
+    UserNotFoundException,
+    UserWithdrawalFailedException,
+)
 from app.core.firebase import get_auth
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_schema.response_schema import GetUserResDTO
@@ -20,7 +24,7 @@ class UserService:
 
         user = await self.user_repository.get_by_id(self.session, user_id)
         if user:
-            raise HTTPException(status_code=409, detail="user-already-exists")
+            raise UserAlreadyExistsException()
 
         await self.user_repository.create(self.session, user_id)
 
@@ -29,7 +33,7 @@ class UserService:
 
         user = await self.user_repository.get_by_id(self.session, user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="user-not-found")
+            raise UserNotFoundException()
 
         total_distance, total_time = await self.user_repository.get_user(
             self.session, user_id
@@ -45,11 +49,11 @@ class UserService:
 
         user = await self.user_repository.get_by_id(self.session, user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="user-not-found")
+            raise UserNotFoundException()
 
         try:
             get_auth().delete_user(user_id)
             await self.user_repository.delete(self.session, user)
-        except Exception:
+        except Exception as e:
             await self.session.rollback()
-            raise HTTPException(status_code=500, detail="user-withdrawal-failed")
+            raise UserWithdrawalFailedException(e=e)
