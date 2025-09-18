@@ -11,7 +11,7 @@ from app.db.models import (
     walk_summaries,
     walks,
 )  # db 정의 때문에 필요
-from app.routers import root, user, test
+from app.routers import course, root, user, test
 
 
 @asynccontextmanager
@@ -41,4 +41,5 @@ app = FastAPI(lifespan=db_lifespan)
 
 app.include_router(root.router)
 app.include_router(user.router)
+app.include_router(course.router)
 app.include_router(test.router)
