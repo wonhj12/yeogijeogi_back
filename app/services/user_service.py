@@ -1,9 +1,7 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.firebase import get_auth
-from app.db.database import get_db
-from app.db.models.users import Users
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_schema.response_schema import GetUserResDTO
 
@@ -11,8 +9,8 @@ from app.schemas.user_schema.response_schema import GetUserResDTO
 class UserService:
     def __init__(
         self,
-        user_repository: UserRepository = Depends(),
-        session: AsyncSession = Depends(get_db),
+        user_repository: UserRepository,
+        session: AsyncSession,
     ):
         self.user_repository = user_repository
         self.session = session

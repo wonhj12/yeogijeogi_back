@@ -1,7 +1,6 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.database import get_db
 from app.repositories.course_repository import CourseRepository
 from app.schemas.course_schema.response_schema import CoursePreview, GetCoursesResDTO
 
@@ -9,8 +8,8 @@ from app.schemas.course_schema.response_schema import CoursePreview, GetCoursesR
 class CourseService:
     def __init__(
         self,
-        course_repository: CourseRepository = Depends(),
-        session: AsyncSession = Depends(get_db),
+        course_repository: CourseRepository,
+        session: AsyncSession,
     ):
         self.course_repo = course_repository
         self.session = session
