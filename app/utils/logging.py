@@ -12,4 +12,5 @@ def setup_logging():
     # Get root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
-    root_logger.addHandler(stream_handler)
+    if not root_logger.handlers:
+        root_logger.addHandler(stream_handler)
