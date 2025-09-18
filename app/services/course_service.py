@@ -15,29 +15,29 @@ class CourseService:
     async def get_courses(self):
         """코스 목록 조회"""
 
-        try:
-            subquery = select(
-                WalkPoints.walk_id,
-                WalkPoints.latitude,
-                WalkPoints.longitude,
-                func.row_number()
-                .over(partition_by=WalkPoints.walk_id, order_by=desc(WalkPoints.id))
-                .label("rn"),
-            ).subquery("last_points")
+        subquery = select(
+            WalkPoints.walk_id,
+            WalkPoints.latitude,
+            WalkPoints.longitude,
+            func.row_number()
+            .over(partition_by=WalkPoints.walk_id, order_by=desc(WalkPoints.id))
+            .label("rn"),
+        ).subquery("last_points")
 
-            main_query = (
-                select(
-                    Walks.id.label("walk_id"),
-                    subquery.c.latitude,
-                    subquery.c.longitude,
-                )
-                .join(subquery, Walks.id == subquery.c.walk_id)
-                .where(
-                    Walks.user_id == self.user_id,
-                    subquery.c.rn == 1,
-                )
+        main_query = (
+            select(
+                Walks.id.label("walk_id"),
+                subquery.c.latitude,
+                subquery.c.longitude,
             )
+            .join(subquery, Walks.id == subquery.c.walk_id)
+            .where(
+                Walks.user_id == self.user_id,
+                subquery.c.rn == 1,
+            )
+        )
 
+        try:
             result = await self.session.execute(main_query)
             course_list = [CoursePreview(**row) for row in result.mappings().all()]
             return GetCoursesResDTO(courses=course_list)
